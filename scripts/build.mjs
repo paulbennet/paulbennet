@@ -24,6 +24,17 @@ const SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, s
 const MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace";
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+// ---------- melody ----------
+// [note, length in sixteenths]; "-" is a rest. Keyboard range: C3..B6.
+const SONG = "Für Elise · Beethoven";
+const UNIT = 0.2; // seconds per sixteenth
+const A = [["E5", 1], ["D#5", 1], ["E5", 1], ["D#5", 1], ["E5", 1], ["B4", 1], ["D5", 1], ["C5", 1],
+  ["A4", 2], ["-", 1], ["C4", 1], ["E4", 1], ["A4", 1], ["B4", 2], ["-", 1]];
+const MELODY = [
+  ...A, ["E4", 1], ["G#4", 1], ["B4", 1], ["C5", 2], ["-", 1], ["E4", 1],
+  ...A, ["E4", 1], ["C5", 1], ["B4", 1], ["A4", 4], ["-", 6],
+];
+
 // ---------- header ----------
 function header(t) {
   const W = 1000, H = 300, KY = 236, KH = 64;
@@ -42,15 +53,35 @@ function header(t) {
     web += `<polyline points="${pts}"/>`;
   }
 
-  // piano: 28 white keys, black keys in the 2-3 pattern
+  // piano: 28 white keys (C3..B6), black keys in the 2-3 pattern.
+  // Each key that the melody uses gets its own keyframes, so it lights up on its notes.
   const n = 28, kw = W / n;
-  let white = "", black = "";
   const hasBlack = [1, 1, 0, 1, 1, 1, 0]; // after C D (no E) F G A (no B)
+  const step = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
+  const keyOf = (note) => {
+    const [, l, sharp, o] = note.match(/^([A-G])(#?)(\d)$/);
+    return `${sharp ? "b" : "w"}${(+o - 3) * 7 + step[l]}`;
+  };
+  const timeline = {}; // key id -> [[start, end], ...] in units
+  let t0 = 0;
+  for (const [note, len] of MELODY) {
+    if (note !== "-") (timeline[keyOf(note)] ??= []).push([t0, t0 + len * 0.85]);
+    t0 += len;
+  }
+  const total = t0, dur = (total * UNIT).toFixed(2);
+  const pct = (u) => ((u / total) * 100).toFixed(3);
+  let css = "";
+  for (const [id, spans] of Object.entries(timeline)) {
+    const lit = id[0] === "w" ? t.accent : t.accent2;
+    const base = id[0] === "w" ? t.keyW : t.keyB;
+    const frames = spans.map(([a, b]) => `${pct(a)}%{fill:${lit}}${pct(b)}%{fill:${base}}`).join("");
+    css += `#${id}{animation:${id} ${dur}s step-end infinite}@keyframes ${id}{0%{fill:${base}}${frames}100%{fill:${base}}}\n`;
+  }
+  let white = "", black = "";
   for (let i = 0; i < n; i++) {
-    const delay = ((i * 7) % n) * 0.18; // scattered "melody"
-    white += `<rect class="k" style="animation-delay:${delay.toFixed(2)}s" x="${(i * kw).toFixed(2)}" y="${KY}" width="${kw.toFixed(2)}" height="${KH}"/>`;
+    white += `<rect id="w${i}" x="${(i * kw).toFixed(2)}" y="${KY}" width="${kw.toFixed(2)}" height="${KH}"/>`;
     if (hasBlack[i % 7] && i < n - 1)
-      black += `<rect x="${(i * kw + kw * 0.68).toFixed(2)}" y="${KY}" width="${(kw * 0.64).toFixed(2)}" height="${KH * 0.6}" rx="2"/>`;
+      black += `<rect id="b${i}" x="${(i * kw + kw * 0.68).toFixed(2)}" y="${KY}" width="${(kw * 0.64).toFixed(2)}" height="${KH * 0.6}" rx="2"/>`;
   }
 
   const tagline = "> lead web developer @ zoho";
@@ -64,9 +95,9 @@ function header(t) {
   <clipPath id="type"><rect x="56" y="140" width="0" height="40"><animate attributeName="width" from="0" to="620" begin="0.4s" dur="1.6s" fill="freeze" calcMode="discrete" values="0;24;48;72;96;120;144;168;192;216;240;264;288;312;336;360;384;408;432;456;480;504;528;552;576;600;620" keyTimes="0;0.04;0.08;0.12;0.16;0.2;0.24;0.28;0.32;0.36;0.4;0.44;0.48;0.52;0.56;0.6;0.64;0.68;0.72;0.76;0.8;0.84;0.88;0.92;0.96;0.98;1"/></rect></clipPath>
 </defs>
 <style>
-  .k { fill: ${t.keyW}; stroke: ${t.keyEdge}; stroke-width: 1; animation: play 5.04s infinite; }
-  @keyframes play { 0%, 4% { fill: ${t.accent}; } 9%, 100% { fill: ${t.keyW}; } }
-  @media (prefers-reduced-motion: reduce) { .k { animation: none; } }
+  .keys rect { fill: ${t.keyW}; stroke: ${t.keyEdge}; stroke-width: 1; }
+  .blacks rect { fill: ${t.keyB}; }
+${css}  @media (prefers-reduced-motion: reduce) { .keys rect, .blacks rect { animation: none; } }
 </style>
 <g clip-path="url(#card)">
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
@@ -84,8 +115,9 @@ function header(t) {
     <text x="56" y="168" font-family="${MONO}" font-size="24" fill="${t.fg}">${esc(tagline)}<tspan fill="${t.accent}">▋<animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></tspan></text>
   </g>
   <text x="56" y="206" font-family="${SANS}" font-size="18" fill="${t.muted}">🕸️ web  ·  🎮 games  ·  🎹 keys  ·  Chennai, India</text>
-  <g>${white}</g>
-  <g fill="${t.keyB}">${black}</g>
+  <text x="${W - 24}" y="${KY - 12}" text-anchor="end" font-family="${SANS}" font-size="13" fill="${t.muted}">♪ ${esc(SONG)}</text>
+  <g class="keys">${white}</g>
+  <g class="blacks">${black}</g>
 </g>
 <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="18" fill="none" stroke="${t.line}"/>
 </svg>
