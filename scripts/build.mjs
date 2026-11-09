@@ -25,14 +25,17 @@ const MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospac
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // ---------- melody ----------
-// [note, length in sixteenths]; "-" is a rest. Keyboard range: C3..B6.
-const SONG = "Für Elise · Beethoven";
-const UNIT = 0.2; // seconds per sixteenth
-const A = [["E5", 1], ["D#5", 1], ["E5", 1], ["D#5", 1], ["E5", 1], ["B4", 1], ["D5", 1], ["C5", 1],
-  ["A4", 2], ["-", 1], ["C4", 1], ["E4", 1], ["A4", 1], ["B4", 2], ["-", 1]];
-const MELODY = [
-  ...A, ["E4", 1], ["G#4", 1], ["B4", 1], ["C5", 2], ["-", 1], ["E4", 1],
-  ...A, ["E4", 1], ["C5", 1], ["B4", 1], ["A4", 4], ["-", 6],
+// Voices play at the same time. Each voice: { hold, events: [[notes, length in units]] }.
+// "hold" is the part of each event the keys stay lit. Keyboard range: C3..B6.
+// Hold the Line intro, simplified from chord charts: F#m | A/C# | D | E (Esus4) in hammered triplets.
+const SONG = "Hold the Line · Toto (intro, simplified)";
+const UNIT = 60 / 96 / 3; // one eighth-note triplet at 96 BPM
+const bar = (chord, hits = 12) => Array(hits).fill([chord, 1]);
+const FSm = ["F#4", "A4", "C#5"], A_C = ["E4", "A4", "C#5"], D = ["F#4", "A4", "D5"];
+const E = ["E4", "G#4", "B4"], Esus = ["E4", "A4", "B4"];
+const VOICES = [
+  { hold: 0.55, events: [...bar(FSm), ...bar(A_C), ...bar(D), ...bar(E, 6), ...bar(Esus, 3), ...bar(E, 3)] },
+  { hold: 0.95, events: [[["F#3"], 12], [["C#3"], 12], [["D3"], 12], [["E3"], 12]] },
 ];
 
 // ---------- header ----------
@@ -63,12 +66,17 @@ function header(t) {
     return `${sharp ? "b" : "w"}${(+o - 3) * 7 + step[l]}`;
   };
   const timeline = {}; // key id -> [[start, end], ...] in units
-  let t0 = 0;
-  for (const [note, len] of MELODY) {
-    if (note !== "-") (timeline[keyOf(note)] ??= []).push([t0, t0 + len * 0.85]);
-    t0 += len;
+  let total = 0;
+  for (const { hold, events } of VOICES) {
+    let t0 = 0;
+    for (const [notes, len] of events) {
+      for (const note of notes) (timeline[keyOf(note)] ??= []).push([t0, t0 + len * hold]);
+      t0 += len;
+    }
+    total = Math.max(total, t0);
   }
-  const total = t0, dur = (total * UNIT).toFixed(2);
+  for (const spans of Object.values(timeline)) spans.sort((a, b) => a[0] - b[0]);
+  const dur = (total * UNIT).toFixed(2);
   const pct = (u) => ((u / total) * 100).toFixed(3);
   let css = "";
   for (const [id, spans] of Object.entries(timeline)) {
