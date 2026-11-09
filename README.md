@@ -1,22 +1,30 @@
-# Hi, I'm Paul 👋
+<div align="center">
 
-Lead web developer at Zoho, in Chennai, India. I build browser tools, developer tools and performance benchmarks. Off the keyboard: 🎮 and 🎹.
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg"><img alt="Paul Bennet, lead web developer at Zoho" src="assets/header-light.svg" width="100%"></picture>
 
-🌐 [paulbennetjoshua.dev](https://paulbennetjoshua.dev)
+<a href="https://paulbennetjoshua.dev"><b>paulbennetjoshua.dev</b></a>
 
-## Projects
+</div>
 
-| Project | What it does |
-|---|---|
-| [agent-response-config](https://github.com/paulbennet/agent-response-config) | Short, structured AI agent replies you answer by ID. For Claude Code, Codex and Copilot. |
-| [afk-mode-mcp](https://github.com/paulbennet/afk-mode-mcp) | Watch and answer VS Code Copilot from your phone, through an MCP server. |
-| [html-in-canvas-examples](https://github.com/paulbennet/html-in-canvas-examples) | WebGL effects on live, interactive DOM with Chrome's HTML-in-Canvas API. |
-| [tab-reuse-manager](https://github.com/paulbennet/tab-reuse-manager) | Chrome extension that reuses tabs for groups of related sites. |
+I build browser tools, developer tools and performance benchmarks. Lately: AI agent workflows, new Chrome APIs, and making data move faster from server to browser.
 
-## Benchmarks
+### 🧰 Things I made
 
-| Project | What it measures |
-|---|---|
-| [server-webclient-data-transfer-perf](https://github.com/paulbennet/server-webclient-data-transfer-perf) | 7 serialization formats, server to browser, end to end. |
-| [json-object-list-perf](https://github.com/paulbennet/json-object-list-perf) | Java JSON libraries on large payloads, with JMH. |
-| [topic-based-ws-messaging-demo](https://github.com/paulbennet/topic-based-ws-messaging-demo) | Topic-based publish/subscribe over WebSockets. |
+<div align="center">
+
+<a href="https://github.com/paulbennet/agent-response-config"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/agent-response-config-dark.svg"><img alt="agent-response-config" src="assets/agent-response-config-light.svg" width="49%"></picture></a>
+<a href="https://github.com/paulbennet/afk-mode-mcp"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/afk-mode-mcp-dark.svg"><img alt="afk-mode-mcp" src="assets/afk-mode-mcp-light.svg" width="49%"></picture></a>
+<br>
+<a href="https://github.com/paulbennet/html-in-canvas-examples"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/html-in-canvas-examples-dark.svg"><img alt="html-in-canvas-examples" src="assets/html-in-canvas-examples-light.svg" width="49%"></picture></a>
+<a href="https://github.com/paulbennet/tab-reuse-manager"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/tab-reuse-manager-dark.svg"><img alt="tab-reuse-manager" src="assets/tab-reuse-manager-light.svg" width="49%"></picture></a>
+<br>
+<a href="https://github.com/paulbennet/server-webclient-data-transfer-perf"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/server-webclient-data-transfer-perf-dark.svg"><img alt="data-transfer-perf" src="assets/server-webclient-data-transfer-perf-light.svg" width="49%"></picture></a>
+<a href="https://github.com/paulbennet/json-object-list-perf"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/json-object-list-perf-dark.svg"><img alt="json-object-list-perf" src="assets/json-object-list-perf-light.svg" width="49%"></picture></a>
+
+</div>
+
+### 🛠️ Stack
+
+`JavaScript` `TypeScript` `Java` `Node.js` `WebGL` `Chrome extensions` `MCP` `WebSockets`
+
+<div align="center"><sub>🎮 when the build runs · 🎹 when it passes</sub></div>

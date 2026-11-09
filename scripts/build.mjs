@@ -1,0 +1,185 @@
+// Builds the profile SVGs (light + dark) into assets/.
+// Run: node scripts/build.mjs
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const out = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
+mkdirSync(out, { recursive: true });
+
+const themes = {
+  dark: {
+    bg1: "#0d1117", bg2: "#161b22", fg: "#e6edf3", muted: "#8b949e",
+    line: "#30363d", accent: "#58a6ff", accent2: "#f778ba",
+    keyW: "#e6edf3", keyB: "#0d1117", keyEdge: "#30363d",
+  },
+  light: {
+    bg1: "#ffffff", bg2: "#f6f8fa", fg: "#1f2328", muted: "#59636e",
+    line: "#d1d9e0", accent: "#0969da", accent2: "#bf3989",
+    keyW: "#ffffff", keyB: "#1f2328", keyEdge: "#d1d9e0",
+  },
+};
+
+const SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+const MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace";
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// ---------- header ----------
+function header(t) {
+  const W = 1000, H = 300, KY = 236, KH = 64;
+
+  // spider web in the top-right corner
+  const cx = W, cy = 0, spokes = 7, rings = [45, 90, 135, 180, 225];
+  const ang = (i) => Math.PI / 2 + (i * (Math.PI / 2)) / (spokes - 1);
+  const pt = (r, i) => [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))];
+  let web = "";
+  for (let i = 0; i < spokes; i++) {
+    const [x, y] = pt(250, i);
+    web += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+  }
+  for (const r of rings) {
+    const pts = [...Array(spokes).keys()].map((i) => pt(r, i).map((v) => v.toFixed(1)).join(",")).join(" ");
+    web += `<polyline points="${pts}"/>`;
+  }
+
+  // piano: 28 white keys, black keys in the 2-3 pattern
+  const n = 28, kw = W / n;
+  let white = "", black = "";
+  const hasBlack = [1, 1, 0, 1, 1, 1, 0]; // after C D (no E) F G A (no B)
+  for (let i = 0; i < n; i++) {
+    const delay = ((i * 7) % n) * 0.18; // scattered "melody"
+    white += `<rect class="k" style="animation-delay:${delay.toFixed(2)}s" x="${(i * kw).toFixed(2)}" y="${KY}" width="${kw.toFixed(2)}" height="${KH}"/>`;
+    if (hasBlack[i % 7] && i < n - 1)
+      black += `<rect x="${(i * kw + kw * 0.68).toFixed(2)}" y="${KY}" width="${(kw * 0.64).toFixed(2)}" height="${KH * 0.6}" rx="2"/>`;
+  }
+
+  const tagline = "> lead web developer @ zoho";
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Paul Bennet, lead web developer at Zoho">
+<title>Paul Bennet</title>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${t.bg1}"/><stop offset="1" stop-color="${t.bg2}"/></linearGradient>
+  <linearGradient id="name" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${t.accent}"/><stop offset="1" stop-color="${t.accent2}"/></linearGradient>
+  <clipPath id="card"><rect width="${W}" height="${H}" rx="18"/></clipPath>
+  <clipPath id="type"><rect x="56" y="140" width="0" height="40"><animate attributeName="width" from="0" to="620" begin="0.4s" dur="1.6s" fill="freeze" calcMode="discrete" values="0;24;48;72;96;120;144;168;192;216;240;264;288;312;336;360;384;408;432;456;480;504;528;552;576;600;620" keyTimes="0;0.04;0.08;0.12;0.16;0.2;0.24;0.28;0.32;0.36;0.4;0.44;0.48;0.52;0.56;0.6;0.64;0.68;0.72;0.76;0.8;0.84;0.88;0.92;0.96;0.98;1"/></rect></clipPath>
+</defs>
+<style>
+  .k { fill: ${t.keyW}; stroke: ${t.keyEdge}; stroke-width: 1; animation: play 5.04s infinite; }
+  @keyframes play { 0%, 4% { fill: ${t.accent}; } 9%, 100% { fill: ${t.keyW}; } }
+  @media (prefers-reduced-motion: reduce) { .k { animation: none; } }
+</style>
+<g clip-path="url(#card)">
+  <rect width="${W}" height="${H}" fill="url(#bg)"/>
+  <g stroke="${t.muted}" stroke-opacity="0.35" stroke-width="1.2" fill="none">${web}</g>
+  <g>
+    <line x1="860" y1="95" x2="860" y2="150" stroke="${t.muted}" stroke-opacity="0.6" stroke-width="1"/>
+    <circle cx="860" cy="156" r="7" fill="${t.fg}"/>
+    <g stroke="${t.fg}" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <path d="M854 152 l-8 -5 M854 156 l-9 0 M854 160 l-8 5 M866 152 l8 -5 M866 156 l9 0 M866 160 l8 5"/>
+    </g>
+    <animateTransform attributeName="transform" type="rotate" values="-6 860 95; 6 860 95; -6 860 95" dur="4s" repeatCount="indefinite"/>
+  </g>
+  <text x="56" y="112" font-family="${SANS}" font-size="60" font-weight="800" fill="url(#name)" letter-spacing="-1">Paul Bennet</text>
+  <g clip-path="url(#type)">
+    <text x="56" y="168" font-family="${MONO}" font-size="24" fill="${t.fg}">${esc(tagline)}<tspan fill="${t.accent}">▋<animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></tspan></text>
+  </g>
+  <text x="56" y="206" font-family="${SANS}" font-size="18" fill="${t.muted}">🕸️ web  ·  🎮 games  ·  🎹 keys  ·  Chennai, India</text>
+  <g>${white}</g>
+  <g fill="${t.keyB}">${black}</g>
+</g>
+<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="18" fill="none" stroke="${t.line}"/>
+</svg>
+`;
+}
+
+// ---------- project cards ----------
+const lang = {
+  JavaScript: "#f1e05a", TypeScript: "#3178c6", Java: "#b07219", HTML: "#e34c26",
+};
+
+const cards = [
+  { id: "agent-response-config", icon: "💬", tag: "Agent skill", lang: "JavaScript",
+    desc: ["Short, structured AI agent replies you", "answer by ID. Claude Code, Codex, Copilot."] },
+  { id: "afk-mode-mcp", icon: "📱", tag: "MCP server", lang: "TypeScript",
+    desc: ["Watch and answer VS Code Copilot", "from your phone while you are away."] },
+  { id: "html-in-canvas-examples", icon: "✨", tag: "WebGL", lang: "TypeScript",
+    desc: ["Shader effects on live, interactive DOM", "with Chrome's HTML-in-Canvas API."] },
+  { id: "tab-reuse-manager", icon: "🗂️", tag: "Chrome extension", lang: "JavaScript",
+    desc: ["Reuses open tabs for groups of related", "sites. No more duplicate tabs."] },
+  { id: "server-webclient-data-transfer-perf", title: "data-transfer-perf", icon: "⏱️", tag: "Benchmark", lang: "HTML",
+    desc: ["7 serialization formats, server to", "browser, measured end to end."] },
+  { id: "json-object-list-perf", icon: "📊", tag: "Benchmark", lang: "Java",
+    desc: ["Java JSON libraries on large payloads:", "Jackson, Gson, Moshi, org.json, JMH."] },
+];
+
+function card(c, t) {
+  const W = 480, H = 150;
+  const title = c.title ?? c.id;
+  const tagW = c.tag.length * 7.4 + 22;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}: ${esc(c.desc.join(" "))}">
+<title>${esc(title)}</title>
+<defs><linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.accent}"/><stop offset="1" stop-color="${t.accent2}"/></linearGradient>
+<clipPath id="c"><rect width="${W}" height="${H}" rx="14"/></clipPath></defs>
+<g clip-path="url(#c)">
+  <rect width="${W}" height="${H}" fill="${t.bg2}"/>
+  <rect width="5" height="${H}" fill="url(#bar)"/>
+</g>
+<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="none" stroke="${t.line}"/>
+<text x="26" y="42" font-family="${SANS}" font-size="20">${c.icon}</text>
+<text x="56" y="41" font-family="${SANS}" font-size="19" font-weight="700" fill="${t.accent}">${esc(title)}</text>
+<text font-family="${SANS}" font-size="15" fill="${t.muted}">
+  <tspan x="26" y="76">${esc(c.desc[0])}</tspan>
+  <tspan x="26" y="98">${esc(c.desc[1])}</tspan>
+</text>
+<circle cx="32" cy="127" r="6" fill="${lang[c.lang]}"/>
+<text x="45" y="132" font-family="${SANS}" font-size="13" fill="${t.muted}">${c.lang}</text>
+<rect x="${W - 22 - tagW}" y="113" width="${tagW}" height="24" rx="12" fill="none" stroke="${t.line}"/>
+<text x="${W - 22 - tagW / 2}" y="130" text-anchor="middle" font-family="${MONO}" font-size="12" fill="${t.fg}">${esc(c.tag)}</text>
+</svg>
+`;
+}
+
+for (const [name, t] of Object.entries(themes)) {
+  writeFileSync(join(out, `header-${name}.svg`), header(t));
+  for (const c of cards) writeFileSync(join(out, `${c.id}-${name}.svg`), card(c, t));
+}
+
+// ---------- README ----------
+const pic = (base, alt, width) =>
+  `<picture><source media="(prefers-color-scheme: dark)" srcset="assets/${base}-dark.svg"><img alt="${alt}" src="assets/${base}-light.svg" width="${width}"></picture>`;
+
+const grid = [];
+for (let i = 0; i < cards.length; i += 2) {
+  grid.push(
+    cards.slice(i, i + 2)
+      .map((c) => `<a href="https://github.com/paulbennet/${c.id}">${pic(c.id, c.title ?? c.id, "49%")}</a>`)
+      .join("\n"),
+  );
+}
+
+const readme = `<div align="center">
+
+${pic("header", "Paul Bennet, lead web developer at Zoho", "100%")}
+
+<a href="https://paulbennetjoshua.dev"><b>paulbennetjoshua.dev</b></a>
+
+</div>
+
+I build browser tools, developer tools and performance benchmarks. Lately: AI agent workflows, new Chrome APIs, and making data move faster from server to browser.
+
+### 🧰 Things I made
+
+<div align="center">
+
+${grid.join("\n<br>\n")}
+
+</div>
+
+### 🛠️ Stack
+
+\`JavaScript\` \`TypeScript\` \`Java\` \`Node.js\` \`WebGL\` \`Chrome extensions\` \`MCP\` \`WebSockets\`
+
+<div align="center"><sub>🎮 when the build runs · 🎹 when it passes</sub></div>
+`;
+writeFileSync(join(out, "..", "README.md"), readme);
+console.log("built", Object.keys(themes).length * (cards.length + 1), "svgs + README.md");

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="150" viewBox="0 0 480 150" role="img" aria-label="html-in-canvas-examples: Shader effects on live, interactive DOM with Chrome's HTML-in-Canvas API.">
+<title>html-in-canvas-examples</title>
+<defs><linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58a6ff"/><stop offset="1" stop-color="#f778ba"/></linearGradient>
+<clipPath id="c"><rect width="480" height="150" rx="14"/></clipPath></defs>
+<g clip-path="url(#c)">
+  <rect width="480" height="150" fill="#161b22"/>
+  <rect width="5" height="150" fill="url(#bar)"/>
+</g>
+<rect x="0.5" y="0.5" width="479" height="149" rx="14" fill="none" stroke="#30363d"/>
+<text x="26" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20">✨</text>
+<text x="56" y="41" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#58a6ff">html-in-canvas-examples</text>
+<text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#8b949e">
+  <tspan x="26" y="76">Shader effects on live, interactive DOM</tspan>
+  <tspan x="26" y="98">with Chrome's HTML-in-Canvas API.</tspan>
+</text>
+<circle cx="32" cy="127" r="6" fill="#3178c6"/>
+<text x="45" y="132" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#8b949e">TypeScript</text>
+<rect x="399" y="113" width="59" height="24" rx="12" fill="none" stroke="#30363d"/>
+<text x="428.5" y="130" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e6edf3">WebGL</text>
+</svg>
