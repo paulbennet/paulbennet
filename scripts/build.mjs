@@ -29,7 +29,9 @@ const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, 
 // "hold" is the part of each event the keys stay lit. Keyboard range: C3..B6.
 // Hold the Line intro, simplified from chord charts: F#m | A/C# | D | E (Esus4) in hammered triplets.
 const SONG = "Hold the Line · Toto (intro, simplified)";
-const UNIT = 60 / 96 / 3; // one eighth-note triplet at 96 BPM
+const BPM = 96;
+const UNIT = 60 / BPM / 3; // one eighth-note triplet
+const COUNT_IN = 12; // one silent bar (4 beats) before the song, in units
 const bar = (chord, hits = 12) => Array(hits).fill([chord, 1]);
 const FSm = ["F#4", "A4", "C#5"], A_C = ["E4", "A4", "C#5"], D = ["F#4", "A4", "D5"];
 const E = ["E4", "G#4", "B4"], Esus = ["E4", "A4", "B4"];
@@ -68,7 +70,7 @@ function header(t) {
   const timeline = {}; // key id -> [[start, end], ...] in units
   let total = 0;
   for (const { hold, events } of VOICES) {
-    let t0 = 0;
+    let t0 = COUNT_IN;
     for (const [notes, len] of events) {
       for (const note of notes) (timeline[keyOf(note)] ??= []).push([t0, t0 + len * hold]);
       t0 += len;
@@ -85,6 +87,19 @@ function header(t) {
     const frames = spans.map(([a, b]) => `${pct(a)}%{fill:${lit}}${pct(b)}%{fill:${base}}`).join("");
     css += `#${id}{animation:${id} ${dur}s step-end infinite}@keyframes ${id}{0%{fill:${base}}${frames}100%{fill:${base}}}\n`;
   }
+  // beat dots before the song title: one dot per beat, beat 1 in accent2.
+  // They also count the silent first bar in. The bar loop divides the song loop, so they stay in sync.
+  const barDur = (UNIT * 12).toFixed(4);
+  let dots = "";
+  for (let k = 0; k < 4; k++) {
+    const lit = k === 0 ? t.accent2 : t.accent, a = k * 25, b = a + 20;
+    const frames = k === 0
+      ? `0%{fill:${lit}}${b}%{fill:${t.line}}`
+      : `0%{fill:${t.line}}${a}%{fill:${lit}}${b}%{fill:${t.line}}`;
+    css += `#beat${k}{animation:beat${k} ${barDur}s step-end infinite}@keyframes beat${k}{${frames}100%{fill:${t.line}}}\n`;
+    dots += `<tspan id="beat${k}" class="beat">●</tspan>${k < 3 ? " " : ""}`;
+  }
+
   let white = "", black = "";
   for (let i = 0; i < n; i++) {
     white += `<rect id="w${i}" x="${(i * kw).toFixed(2)}" y="${KY}" width="${kw.toFixed(2)}" height="${KH}"/>`;
@@ -105,7 +120,8 @@ function header(t) {
 <style>
   .keys rect { fill: ${t.keyW}; stroke: ${t.keyEdge}; stroke-width: 1; }
   .blacks rect { fill: ${t.keyB}; }
-${css}  @media (prefers-reduced-motion: reduce) { .keys rect, .blacks rect { animation: none; } }
+  .beat { fill: ${t.line}; }
+${css}  @media (prefers-reduced-motion: reduce) { .keys rect, .blacks rect, .beat { animation: none; } }
 </style>
 <g clip-path="url(#card)">
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
@@ -123,7 +139,7 @@ ${css}  @media (prefers-reduced-motion: reduce) { .keys rect, .blacks rect { ani
     <text x="56" y="168" font-family="${MONO}" font-size="24" fill="${t.fg}">${esc(tagline)}<tspan fill="${t.accent}">▋<animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></tspan></text>
   </g>
   <text x="56" y="206" font-family="${SANS}" font-size="18" fill="${t.muted}">🕸️ web  ·  🎮 games  ·  🎹 keys  ·  Chennai, India</text>
-  <text x="${W - 24}" y="${KY - 12}" text-anchor="end" font-family="${SANS}" font-size="13" fill="${t.muted}">♪ ${esc(SONG)}</text>
+  <text x="${W - 24}" y="${KY - 12}" text-anchor="end" font-family="${SANS}" font-size="13" fill="${t.muted}"><tspan font-size="18" aria-hidden="true">${dots}</tspan><tspan dx="10">♪ ${esc(SONG)}</tspan></text>
   <g class="keys">${white}</g>
   <g class="blacks">${black}</g>
 </g>
