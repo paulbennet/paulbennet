@@ -237,8 +237,8 @@ ${grid.join("\n<br>\n")}
 
 ### ✍️ Writing
 
-- [Your Android TV home screen is a web page now](https://paulbennet.github.io/AndroidTVLauncher/blog/) · Nov 2026
-- [Stop scrolling agent replies](https://paulbennet.github.io/agent-response-config/blog/stop-scrolling-agent-replies/) · Nov 2026
+- [Your Android TV home screen is a web page now](https://dev.to/paulbennetjoshua/your-android-tv-home-screen-is-a-web-page-now-an-open-launcher-anyone-can-reskin-3ld5) · Nov 2026
+- [Stop scrolling agent replies](https://dev.to/paulbennetjoshua/stop-scrolling-agent-replies-1o17) · Nov 2026
 
 ### 🛠️ Stack
 
