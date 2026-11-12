@@ -154,8 +154,10 @@ const lang = {
 };
 
 const cards = [
-  { id: "agent-response-config", icon: "💬", tag: "Agent skill", lang: "JavaScript",
-    desc: ["Short, structured AI agent replies you", "answer by ID. Claude Code, Codex, Copilot."] },
+  { id: "AndroidTVLauncher", icon: "📺", tag: "TV launcher", lang: "JavaScript",
+    desc: ["Skinnable HTML/CSS/JS home screen for", "Android TV and Google TV. 9 skins."] },
+  { id: "agent-response-config", icon: "💬", tag: "Claude plugin", lang: "JavaScript",
+    desc: ["Short, structured agent replies you answer", "by ID. Skill and plugin for Claude, Codex."] },
   { id: "afk-mode-mcp", icon: "📱", tag: "MCP server", lang: "TypeScript",
     desc: ["Watch and answer VS Code Copilot", "from your phone while you are away."] },
   { id: "html-in-canvas-examples", icon: "✨", tag: "WebGL", lang: "TypeScript",
@@ -166,6 +168,8 @@ const cards = [
     desc: ["7 serialization formats, server to", "browser, measured end to end."] },
   { id: "json-object-list-perf", icon: "📊", tag: "Benchmark", lang: "Java",
     desc: ["Java JSON libraries on large payloads:", "Jackson, Gson, Moshi, org.json, JMH."] },
+  { id: "topic-based-ws-messaging-demo", icon: "📡", tag: "WebSockets", lang: "JavaScript",
+    desc: ["Topic-based publish/subscribe over", "WebSockets, with subscriber and broadcaster."] },
 ];
 
 function card(c, t) {
@@ -221,7 +225,7 @@ ${pic("header", "Paul Bennet, lead web developer at Zoho", "100%")}
 
 </div>
 
-I build browser tools, developer tools and performance benchmarks. Lately: AI agent workflows, new Chrome APIs, and making data move faster from server to browser.
+I build browser tools, developer tools and performance benchmarks. Lately: AI agent workflows, new Chrome APIs, web home screens for Android TV, and making data move faster from server to browser.
 
 ### 🧰 Things I made
 
@@ -231,9 +235,14 @@ ${grid.join("\n<br>\n")}
 
 </div>
 
+### ✍️ Writing
+
+- [Your Android TV home screen is a web page now](https://paulbennet.github.io/AndroidTVLauncher/blog/) · Nov 2026
+- [Stop scrolling agent replies](https://paulbennet.github.io/agent-response-config/blog/stop-scrolling-agent-replies/) · Nov 2026
+
 ### 🛠️ Stack
 
-\`JavaScript\` \`TypeScript\` \`Java\` \`Node.js\` \`WebGL\` \`Chrome extensions\` \`MCP\` \`WebSockets\`
+\`JavaScript\` \`TypeScript\` \`Java\` \`Node.js\` \`WebGL\` \`Chrome extensions\` \`Android TV\` \`MCP\` \`WebSockets\`
 
 <div align="center"><sub>🎮 when the build runs · 🎹 when it passes</sub></div>
 `;
